@@ -1,6 +1,6 @@
 import { Redo2, Undo2 } from 'lucide-react'
 import { useStore } from 'zustand'
-import type { Currency, PlanYear, Scope } from '../../model/types'
+import type { Currency, Scope } from '../../model/types'
 import { redo, undo, usePlanStore } from '../../store/planStore'
 import { useUiStore } from '../../store/uiStore'
 import { cn } from '../cn'
@@ -39,14 +39,6 @@ export function TopBar({ onSignOut }: { onSignOut?: () => void }) {
               ]}
             />
           )}
-          <Segmented<PlanYear>
-            value={settings.planYear}
-            onChange={(y) => update((d) => void (d.settings.planYear = y))}
-            options={[
-              { value: 2026, label: '2026', title: 'Plan with 2026 tax rules' },
-              { value: 2027, label: '2027', title: 'Plan with 2027 tax rules' },
-            ]}
-          />
           <Segmented<Currency>
             value={settings.displayCurrency}
             onChange={(c) => update((d) => void (d.settings.displayCurrency = c))}

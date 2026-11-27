@@ -1,4 +1,5 @@
 import type { Account, Expense, Person, PersonId, Plan } from './types'
+import { currentPlanStartYear } from './planStartYear'
 
 function expense(
   id: string,
@@ -77,7 +78,7 @@ export function createDefaultPlan(): Plan {
 
   return {
     schemaVersion: 2,
-    settings: { planYear: 2027, displayCurrency: 'USD', fxCadPerUsd: 1.4, theme: 'midnight' },
+    settings: { planYear: currentPlanStartYear(), displayCurrency: 'USD', fxCadPerUsd: 1.4, theme: 'midnight' },
     people: [jerry, sophia],
     shared: {
       expenses: [

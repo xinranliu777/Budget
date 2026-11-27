@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createDefaultPlan } from './defaults'
+import { currentPlanStartYear } from './planStartYear'
 import { migratePlan, SCHEMA_VERSION } from './schema'
 import { CATEGORIES } from './categories'
 
@@ -9,7 +10,7 @@ describe('default plan (seeded from Finances.numbers)', () => {
 
   it('carries the sheet values', () => {
     expect(plan.settings.fxCadPerUsd).toBe(1.4)
-    expect(plan.settings.planYear).toBe(2027)
+    expect(plan.settings.planYear).toBe(currentPlanStartYear())
     expect(jerry.income.baseSalary).toBe(100000)
     expect(jerry.income.bonusPct).toBe(15)
     expect(jerry.savingsRatePct).toBe(63)

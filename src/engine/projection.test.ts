@@ -6,6 +6,7 @@ import { projectPlan } from './projection'
 
 function isolatedPlan(balance = 100000): Plan {
   const p = createDefaultPlan()
+  p.settings.planYear = 2027
   p.properties = []
   p.debts = []
   p.people.forEach((person) => (person.savingsRatePct = 0))
@@ -51,8 +52,8 @@ describe('goal solver', () => {
   it('computes the target in nominal and today dollars', () => {
     const p = createDefaultPlan()
     const g = goalTarget(p)
-    expect(g.monthsAway).toBe((2055 - 2027) * 12)
-    expect(g.nominal).toBeCloseTo(2_500_000 * 1.025 ** 28, 0)
+    expect(g.monthsAway).toBe((2055 - p.settings.planYear) * 12)
+    expect(g.nominal).toBeCloseTo(2_500_000 * 1.025 ** g.yearsAway, 0)
     expect(g.today).toBe(2_500_000)
   })
 

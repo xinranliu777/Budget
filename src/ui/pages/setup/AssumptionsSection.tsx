@@ -2,7 +2,7 @@ import { Check, Download, RotateCcw, Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { persistenceDataCardSubtitle } from '../../../lib/persistence'
 import { PLACEHOLDERS } from '../../../model/placeholders'
-import type { Assumptions, PlanYear } from '../../../model/types'
+import type { Assumptions } from '../../../model/types'
 import { usePlanStore } from '../../../store/planStore'
 import { usePlan } from '../../../store/selectors'
 import { useUiStore } from '../../../store/uiStore'
@@ -106,18 +106,18 @@ export function AssumptionsSection() {
       </div>
 
       <div className="col-span-12 space-y-5 xl:col-span-6">
+        <Card
+          title="Tax rules"
+          subtitle="Federal, NY, NYC, FICA, and contribution limits — applied per calendar year in projections"
+        >
+          <p className="text-sm leading-relaxed text-muted">
+            Pay and tax figures use <strong className="font-medium text-ink">{s.planYear}</strong> rules for this year’s
+            plan. Each future year in the projection uses that year’s tables automatically (published values through 2027,
+            then inflation-indexed federal limits). You don’t choose brackets here — only your income, deductions, and
+            assumptions.
+          </p>
+        </Card>
         <Card title="Plan">
-          <Field label="Tax year" hint="Brackets and limits for this year; projections start here">
-            <Segmented<PlanYear>
-              size="sm"
-              value={s.planYear}
-              onChange={(v) => update((d) => void (d.settings.planYear = v))}
-              options={[
-                { value: 2026, label: '2026' },
-                { value: 2027, label: '2027' },
-              ]}
-            />
-          </Field>
           <Field label="Show amounts in">
             <Segmented
               size="sm"
