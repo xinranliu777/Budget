@@ -16,8 +16,8 @@ describe('travel planner', () => {
   })
 })
 
-describe('computePlan budgets (2027 defaults)', () => {
-  const r = computePlan(createDefaultPlan())
+describe('computePlan budgets (2027 tax year pinned)', () => {
+  const r = computePlan(planWith((p) => void (p.settings.planYear = 2027)))
   const jb = r.budgets.jerry
 
   it('takes savings off the top of take-home', () => {

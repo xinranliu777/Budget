@@ -1,4 +1,5 @@
 import { createDefaultPlan } from './defaults'
+import { alignPlanStartYear } from './planStartYear'
 import type { Plan } from './types'
 
 export const SCHEMA_VERSION = 2 as const
@@ -53,5 +54,6 @@ export function migratePlan(raw: unknown): Plan {
     bankLinks,
   }
   plan.schemaVersion = SCHEMA_VERSION
+  alignPlanStartYear(plan)
   return plan
 }

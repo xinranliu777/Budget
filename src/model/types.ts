@@ -3,7 +3,8 @@ export type Frequency = 'monthly' | 'yearly'
 export type PersonId = 'jerry' | 'sophia'
 export type Scope = PersonId | 'household'
 export type ThemeId = 'midnight' | 'aurora' | 'dusk' | 'daylight'
-export type PlanYear = 2026 | 2027
+/** Calendar year the plan starts; projections use getTables(planYear + t) for each year t. */
+export type PlanYear = number
 export type PageId = 'home' | 'months' | 'setup'
 export type SetupSection = 'pay' | 'budget' | 'accounts' | 'condo' | 'goal' | 'assumptions'
 
