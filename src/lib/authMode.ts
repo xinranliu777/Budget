@@ -5,7 +5,7 @@ export function useCloudAuth(): boolean {
   return import.meta.env.PROD || isSupabaseConfigured()
 }
 
+/** Sign-up is on in production unless VITE_ALLOW_SIGNUP=false. Each account only sees its own plan (RLS). */
 export function allowSelfServeSignUp(): boolean {
-  if (!import.meta.env.PROD) return true
-  return import.meta.env.VITE_ALLOW_SIGNUP === 'true'
+  return import.meta.env.VITE_ALLOW_SIGNUP !== 'false'
 }
