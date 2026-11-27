@@ -5,6 +5,7 @@ import { cn } from '../cn'
 import { ProgressBar } from '../components/feedback'
 import { formatPct } from '../format'
 import { LogoMark } from './Logo'
+import { persistenceSidebarNote } from '../../lib/persistence'
 import { NAV } from './nav'
 
 function GoalPill() {
@@ -64,7 +65,7 @@ export function Sidebar() {
       <div className="mt-auto space-y-3">
         <GoalPill />
         <p className="px-2 text-[11px] leading-relaxed text-faint">
-          Saved in this browser. Export a backup from Setup.
+          {persistenceSidebarNote()}
           <br />
           Planning estimates, not tax advice.
         </p>

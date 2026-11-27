@@ -1,5 +1,6 @@
 import { Check, Download, RotateCcw, Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
+import { persistenceDataCardSubtitle } from '../../../lib/persistence'
 import { PLACEHOLDERS } from '../../../model/placeholders'
 import type { Assumptions, PlanYear } from '../../../model/types'
 import { usePlanStore } from '../../../store/planStore'
@@ -59,7 +60,7 @@ export function AssumptionsSection() {
             <NumberField key={a.key} label={a.label} hint={a.hint} value={plan.assumptions[a.key]} onChange={(v) => update((d) => void (d.assumptions[a.key] = v))} suffix="%" decimals={2} min={a.key === 'stockReturnPct' ? -5 : 0} max={a.max} step={a.step} />
           ))}
         </Card>
-        <Card title="Your data" subtitle="Saved automatically in this browser only — export a backup to move it or keep it safe">
+        <Card title="Your data" subtitle={persistenceDataCardSubtitle()}>
           <div className="flex flex-wrap items-center gap-2">
             <Button variant="outline" onClick={() => download(`tandem-plan-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(plan, null, 2))}>
               <Download size={14} /> Export plan
