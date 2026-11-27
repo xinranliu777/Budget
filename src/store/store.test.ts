@@ -1,9 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest'
+import { assetsAtMonth, goalTarget } from '../engine/goal'
+import { projectPlan } from '../engine/projection'
 import { createDefaultPlan } from '../model/defaults'
 import { flushSave, redo, resetHistory, undo, usePlanStore } from './planStore'
 import { LocalStorageRepository, MemoryStorage, STORAGE_KEY } from './repository'
-import { applyWhatIf, commitWhatIf, selectGoal, selectPlanResult } from './selectors'
-import { EMPTY_WHAT_IF, pageFromHash } from './uiStore'
+import { selectGoal, selectPlanResult } from './selectors'
+import { routeFromHash } from './uiStore'
 
 describe('LocalStorageRepository', () => {
   it('round-trips a plan', async () => {
@@ -120,38 +122,23 @@ describe('selectors', () => {
   it('memoizes on plan identity', () => {
     const plan = createDefaultPlan()
     expect(selectPlanResult(plan)).toBe(selectPlanResult(plan))
-    expect(selectGoal(plan, EMPTY_WHAT_IF)).toBe(selectGoal(plan, EMPTY_WHAT_IF))
+    expect(selectGoal(plan)).toBe(selectGoal(plan))
   })
 
-  it('applies and commits what-ifs', () => {
+  it('what-if return shift lowers projected assets at the goal date', () => {
     const plan = createDefaultPlan()
-    const w = { savingsRatePct: 30, returnShiftPct: -1, targetYear: 2050, targetAmount: 3_000_000 }
-    const { plan: eff, opts } = applyWhatIf(plan, w)
-    expect(eff.goal.by).toEqual({ mode: 'date', year: 2050, month: 1 })
-    expect(plan.goal.by).toEqual({ mode: 'date', year: 2055, month: 1 })
-    expect(opts).toEqual({ returnShiftPct: -1, savingsRateOverridePct: { jerry: 30, sophia: 30 } })
-
-    const draft = structuredClone(plan)
-    commitWhatIf(draft, w)
-    expect(draft.people.map((p) => p.savingsRatePct)).toEqual([30, 30])
-    expect(draft.assumptions.stockReturnPct).toBe(7)
-    expect(draft.goal.target).toMatchObject({ amount: 3_000_000 })
-  })
-
-  it('what-if savings rate lowers the projection', () => {
-    const plan = createDefaultPlan()
-    const base = selectGoal(plan, EMPTY_WHAT_IF)
-    const lower = selectGoal(plan, { ...EMPTY_WHAT_IF, savingsRatePct: 20 })
-    expect(lower.whatIfActive).toBe(true)
-    expect(lower.goal.projectedAtTarget).toBeLessThan(base.goal.projectedAtTarget)
+    const proj = projectPlan(plan)
+    const pessimistic = projectPlan(plan, { returnShiftPct: -3 })
+    const month = goalTarget(plan).monthsAway
+    expect(assetsAtMonth(plan, pessimistic, month)).toBeLessThan(assetsAtMonth(plan, proj, month))
   })
 })
 
-describe('pageFromHash', () => {
-  it('parses known pages and falls back to overview', () => {
-    expect(pageFromHash('#/budget')).toBe('budget')
-    expect(pageFromHash('#goal')).toBe('goal')
-    expect(pageFromHash('#/nope')).toBe('overview')
-    expect(pageFromHash('')).toBe('overview')
+describe('routeFromHash', () => {
+  it('parses known pages and falls back to home', () => {
+    expect(routeFromHash('#/setup/budget')).toEqual({ page: 'setup', section: 'budget' })
+    expect(routeFromHash('#/months')).toEqual({ page: 'months', section: null })
+    expect(routeFromHash('#/nope')).toEqual({ page: 'home', section: null })
+    expect(routeFromHash('')).toEqual({ page: 'home', section: null })
   })
 })

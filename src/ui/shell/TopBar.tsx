@@ -7,7 +7,7 @@ import { cn } from '../cn'
 import { Segmented } from '../components/inputs'
 import { NAV, navItem } from './nav'
 
-export function TopBar() {
+export function TopBar({ onSignOut }: { onSignOut?: () => void }) {
   const page = useUiStore((s) => s.page)
   const setPage = useUiStore((s) => s.setPage)
   const scope = useUiStore((s) => s.scope)
@@ -55,13 +55,20 @@ export function TopBar() {
               { value: 'CAD', label: 'CAD' },
             ]}
           />
-          <div className="flex items-center rounded-xl border border-line bg-surface p-0.5">
-            <button type="button" onClick={undo} disabled={!canUndo} title="Undo (⌘Z)" aria-label="Undo" className="rounded-[10px] p-1.5 text-muted transition-colors hover:bg-surface-2 hover:text-ink disabled:opacity-30">
-              <Undo2 size={16} />
-            </button>
-            <button type="button" onClick={redo} disabled={!canRedo} title="Redo (⇧⌘Z)" aria-label="Redo" className="rounded-[10px] p-1.5 text-muted transition-colors hover:bg-surface-2 hover:text-ink disabled:opacity-30">
-              <Redo2 size={16} />
-            </button>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center rounded-xl border border-line bg-surface p-0.5">
+              <button type="button" onClick={undo} disabled={!canUndo} title="Undo (⌘Z)" aria-label="Undo" className="rounded-[10px] p-1.5 text-muted transition-colors hover:bg-surface-2 hover:text-ink disabled:opacity-30">
+                <Undo2 size={16} />
+              </button>
+              <button type="button" onClick={redo} disabled={!canRedo} title="Redo (⇧⌘Z)" aria-label="Redo" className="rounded-[10px] p-1.5 text-muted transition-colors hover:bg-surface-2 hover:text-ink disabled:opacity-30">
+                <Redo2 size={16} />
+              </button>
+            </div>
+            {onSignOut && (
+              <button type="button" onClick={onSignOut} className="rounded-xl border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2 hover:text-ink">
+                Sign out
+              </button>
+            )}
           </div>
         </div>
       </div>
