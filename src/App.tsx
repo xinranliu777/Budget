@@ -2,12 +2,14 @@ import { TriangleAlert, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState, type ReactNode } from 'react'
 import type { PageId } from './model/types'
+import { useCloudAuth } from './lib/authMode'
 import { isSupabaseConfigured, getSupabase } from './lib/supabase'
 import { flushSave, redo, resetHistory, undo, usePlanStore } from './store/planStore'
 import { LocalStorageRepository } from './store/repository'
 import { SupabasePlanRepository } from './store/supabaseRepository'
 import { routeFromHash, useUiStore } from './store/uiStore'
 import { AuthScreen } from './ui/auth/AuthScreen'
+import { DeploymentConfigError } from './ui/auth/DeploymentConfigError'
 import { HomePage } from './ui/pages/HomePage'
 import { MonthsPage } from './ui/pages/MonthsPage'
 import { SetupPage } from './ui/pages/SetupPage'
@@ -161,5 +163,9 @@ function SupabaseApp() {
 }
 
 export default function App() {
-  return isSupabaseConfigured() ? <SupabaseApp /> : <LocalApp />
+  if (useCloudAuth()) {
+    if (!isSupabaseConfigured()) return <DeploymentConfigError />
+    return <SupabaseApp />
+  }
+  return <LocalApp />
 }

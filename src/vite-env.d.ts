@@ -10,6 +10,8 @@ interface ImportMetaEnv {
   /** Injected at build from unprefixed Vercel integration vars (see vite.config.ts). */
   readonly SUPABASE_URL?: string
   readonly SUPABASE_PUBLISHABLE_KEY?: string
+  /** Set to `true` on Vercel to show public sign-up on the login screen (off in production by default). */
+  readonly VITE_ALLOW_SIGNUP?: string
 }
 
 interface ImportMeta {
