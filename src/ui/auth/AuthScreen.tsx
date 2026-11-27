@@ -35,7 +35,7 @@ export function AuthScreen({ onSignedIn }: { onSignedIn: () => void }) {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Sign in to Budget</h1>
           <p className="mt-1 text-sm text-muted">
-            Sign in to open your household plan. Nothing is shown until you authenticate.
+            Sign in to open your plan. Use one shared login for your household—each account only sees its own data.
           </p>
         </div>
         <label className="block text-sm">
@@ -79,7 +79,7 @@ export function AuthScreen({ onSignedIn }: { onSignedIn: () => void }) {
             {mode === 'signin' ? 'Need an account? Sign up' : 'Already have an account? Sign in'}
           </button>
         ) : (
-          <p className="text-center text-xs text-faint">New accounts are created in Supabase; ask your admin for access.</p>
+          <p className="text-center text-xs text-faint">Sign-up is disabled on this deployment.</p>
         )}
       </form>
     </div>
