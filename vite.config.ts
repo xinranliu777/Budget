@@ -29,10 +29,19 @@ function balancesApi(): Plugin {
   }
 }
 
-export default defineConfig({
-  plugins: [react(), tailwindcss(), balancesApi()],
-  test: {
-    environment: 'node',
-    include: ['src/**/*.test.ts'],
-  },
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  return {
+    plugins: [react(), tailwindcss(), balancesApi()],
+    /** Vercel Supabase integration often sets NEXT_PUBLIC_* rather than VITE_*. */
+    envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
+    define: {
+      'import.meta.env.SUPABASE_URL': JSON.stringify(env.SUPABASE_URL ?? ''),
+      'import.meta.env.SUPABASE_PUBLISHABLE_KEY': JSON.stringify(env.SUPABASE_PUBLISHABLE_KEY ?? ''),
+    },
+    test: {
+      environment: 'node',
+      include: ['src/**/*.test.ts'],
+    },
+  }
 })
