@@ -7,6 +7,7 @@ import { formatPct } from '../format'
 import { LogoMark } from './Logo'
 import { persistenceSidebarNote } from '../../lib/persistence'
 import { NAV } from './nav'
+import { ThemePicker } from './ThemePicker'
 
 function GoalPill() {
   const goal = useGoal()
@@ -63,6 +64,7 @@ export function Sidebar() {
         })}
       </nav>
       <div className="mt-auto space-y-3">
+        <ThemePicker />
         <GoalPill />
         <p className="px-2 text-[11px] leading-relaxed text-faint">
           {persistenceSidebarNote()}

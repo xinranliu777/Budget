@@ -47,11 +47,16 @@ export function migratePlan(raw: unknown): Plan {
     if (!isRecord(link)) continue
     bankLinks[id] = { accountId: typeof link.accountId === 'string' && link.accountId ? link.accountId : null }
   }
+  const bankSyncToken =
+    typeof (plan.actuals as { bankSyncToken?: unknown }).bankSyncToken === 'string'
+      ? ((plan.actuals as { bankSyncToken: string }).bankSyncToken.trim() || undefined)
+      : undefined
   plan.actuals = {
     months,
     snapshots: plan.actuals.snapshots.filter((s) => isRecord(s) && typeof s.date === 'string' && isRecord(s.balances)),
     baseline: isRecord(plan.actuals.baseline) && isRecord(plan.actuals.baseline.invested) ? plan.actuals.baseline : null,
     bankLinks,
+    bankSyncToken,
   }
   plan.schemaVersion = SCHEMA_VERSION
   alignPlanStartYear(plan)
