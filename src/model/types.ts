@@ -53,6 +53,8 @@ export interface Actuals {
   baseline: Baseline | null
   /** SimpleFIN account id → link. Missing id means it has never been chosen. */
   bankLinks: Record<string, BankLink>
+  /** Bearer token for /api/balances; synced with the household plan (same value as Vercel SYNC_SECRET). */
+  bankSyncToken?: string
 }
 
 export type CategoryId =

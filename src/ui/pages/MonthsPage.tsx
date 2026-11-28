@@ -131,6 +131,20 @@ function saveBalances(plan: Plan, date: string, balances: Record<string, number>
 
 const SYNC_SECRET_KEY = 'tandem.syncSecret'
 
+function readSyncToken(plan: Plan): string {
+  return plan.actuals.bankSyncToken?.trim() || localStorage.getItem(SYNC_SECRET_KEY) || ''
+}
+
+function persistSyncToken(value: string, update: (fn: (d: Plan) => void) => void): void {
+  const trimmed = value.trim()
+  if (trimmed) localStorage.setItem(SYNC_SECRET_KEY, trimmed)
+  else localStorage.removeItem(SYNC_SECRET_KEY)
+  update((d) => {
+    if (trimmed) d.actuals.bankSyncToken = trimmed
+    else delete d.actuals.bankSyncToken
+  })
+}
+
 /** Bank fills win. Hand edits to accounts the bank is not updating are kept. */
 function overlayDraft(base: Record<string, number>, draft: Record<string, number>, balances: Record<string, number>): Record<string, number> {
   const next = { ...base }
@@ -147,7 +161,8 @@ function BalancesDrawer() {
   const [base, setBase] = useState<Record<string, number>>({})
   const [date, setDate] = useState(todayIso)
   const [wasOpen, setWasOpen] = useState(false)
-  const [secret, setSecret] = useState(() => localStorage.getItem(SYNC_SECRET_KEY) ?? '')
+  const [secret, setSecret] = useState(() => readSyncToken(plan))
+  const [editToken, setEditToken] = useState(false)
   const [remote, setRemote] = useState<RemoteBalance[] | null>(null)
   const [notices, setNotices] = useState<string[]>([])
   const [syncError, setSyncError] = useState<string | null>(null)
@@ -162,6 +177,14 @@ function BalancesDrawer() {
       setRemote(null)
       setNotices([])
       setSyncError(null)
+      let token = readSyncToken(plan)
+      const legacy = localStorage.getItem(SYNC_SECRET_KEY)?.trim()
+      if (!plan.actuals.bankSyncToken && legacy) {
+        persistSyncToken(legacy, update)
+        token = legacy
+      }
+      setSecret(token)
+      setEditToken(!token)
     }
   }
 
@@ -215,25 +238,47 @@ function BalancesDrawer() {
       </div>
       <div className="mb-5 rounded-xl border border-line bg-surface/40 p-3">
         <div className="text-xs font-semibold tracking-wide text-muted uppercase">From your bank</div>
-        <p className="mt-1 text-xs leading-relaxed text-faint">Fetches balances only. The sync token matches SYNC_SECRET on the server and stays in this browser.</p>
-        <div className="mt-2 flex items-center gap-2">
-          <input
-            type="password"
-            value={secret}
-            autoComplete="off"
-            placeholder="Sync token"
-            aria-label="Sync token"
-            onChange={(e) => {
-              setSecret(e.target.value)
-              if (e.target.value.trim()) localStorage.setItem(SYNC_SECRET_KEY, e.target.value.trim())
-              else localStorage.removeItem(SYNC_SECRET_KEY)
-            }}
-            className="min-w-0 flex-1 rounded-lg bg-surface-2 px-2 py-1.5 text-sm text-ink outline-none focus:ring-1 focus:ring-accent/50"
-          />
-          <Button size="sm" variant="outline" disabled={!secret.trim() || syncing} onClick={() => void fetchBalances()}>
-            <RefreshCw size={13} className={syncing ? 'animate-spin' : undefined} /> {syncing ? 'Fetching' : 'Fetch balances'}
-          </Button>
-        </div>
+        <p className="mt-1 text-xs leading-relaxed text-faint">
+          Fetches balances only (not transactions). Pair each bank account with a plan account below; mappings are saved in your plan.
+        </p>
+        {secret.trim() && !editToken ? (
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <span className="text-xs text-muted">Sync token saved</span>
+            <Button size="sm" variant="outline" onClick={() => setEditToken(true)}>
+              Change
+            </Button>
+            <Button size="sm" variant="outline" disabled={syncing} onClick={() => void fetchBalances()}>
+              <RefreshCw size={13} className={syncing ? 'animate-spin' : undefined} /> {syncing ? 'Fetching' : 'Fetch balances'}
+            </Button>
+          </div>
+        ) : (
+          <div className="mt-2 flex items-center gap-2">
+            <input
+              type="password"
+              value={secret}
+              autoComplete="off"
+              placeholder="Sync token"
+              aria-label="Sync token"
+              onChange={(e) => {
+                setSecret(e.target.value)
+                persistSyncToken(e.target.value, update)
+              }}
+              className="min-w-0 flex-1 rounded-lg bg-surface-2 px-2 py-1.5 text-sm text-ink outline-none focus:ring-1 focus:ring-accent/50"
+            />
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={!secret.trim() || syncing}
+              onClick={() => {
+                persistSyncToken(secret, update)
+                setEditToken(false)
+                void fetchBalances()
+              }}
+            >
+              <RefreshCw size={13} className={syncing ? 'animate-spin' : undefined} /> {syncing ? 'Fetching' : 'Save & fetch'}
+            </Button>
+          </div>
+        )}
         {syncError && <p className="mt-2 text-xs text-negative">{syncError}</p>}
         {notices.map((n) => (
           <p key={n} className="mt-2 text-xs text-warning">
